@@ -1,3 +1,12 @@
+@import '~@fortawesome/fontawesome-free/css/all.css';
+@import '~semantic-ui-css/semantic.css';
+
+body {
+  background-image: url(background.jpg);
+  background-size: 800px;
+  background-position: center;
+}
+
 .App {
   text-align: center;
 }

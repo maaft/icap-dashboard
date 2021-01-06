@@ -128,9 +128,10 @@ type SubscribeAccount struct {
 }
 type QueryToken struct {
 	QueryToken []*struct {
-		Ticker string  "json:\"ticker\" graphql:\"ticker\""
-		Nav    float64 "json:\"nav\" graphql:\"nav\""
-		Name   string  "json:\"name\" graphql:\"name\""
+		Ticker         string  "json:\"ticker\" graphql:\"ticker\""
+		Nav            float64 "json:\"nav\" graphql:\"nav\""
+		Name           string  "json:\"name\" graphql:\"name\""
+		BaseMultiplier float64 "json:\"baseMultiplier\" graphql:\"baseMultiplier\""
 	} "json:\"queryToken\" graphql:\"queryToken\""
 }
 type SubscribeToken struct {
@@ -158,9 +159,10 @@ type GetAccount struct {
 		Stakes []*struct {
 			ID    string "json:\"id\" graphql:\"id\""
 			Token struct {
-				Name   string  "json:\"name\" graphql:\"name\""
-				Ticker string  "json:\"ticker\" graphql:\"ticker\""
-				Nav    float64 "json:\"nav\" graphql:\"nav\""
+				Name           string  "json:\"name\" graphql:\"name\""
+				Ticker         string  "json:\"ticker\" graphql:\"ticker\""
+				Nav            float64 "json:\"nav\" graphql:\"nav\""
+				BaseMultiplier float64 "json:\"baseMultiplier\" graphql:\"baseMultiplier\""
 			} "json:\"token\" graphql:\"token\""
 			CommittedStakingPeriod int     "json:\"committedStakingPeriod\" graphql:\"committedStakingPeriod\""
 			Amount                 float64 "json:\"amount\" graphql:\"amount\""
@@ -346,6 +348,7 @@ const QueryTokenQuery = `query queryToken {
 		ticker
 		nav
 		name
+		baseMultiplier
 	}
 }
 `
@@ -428,6 +431,7 @@ const GetAccountQuery = `query GetAccount ($address: String!) {
 				name
 				ticker
 				nav
+				baseMultiplier
 			}
 			committedStakingPeriod
 			amount

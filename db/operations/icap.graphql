@@ -59,6 +59,7 @@ query queryToken {
     ticker
     nav
     name
+    baseMultiplier
   }
 }
 
@@ -93,6 +94,7 @@ query GetAccount($address: String!) {
         name
         ticker
         nav
+        baseMultiplier
       }
       committedStakingPeriod
       amount
