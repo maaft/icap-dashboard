@@ -1,0 +1,13 @@
+overwrite: true
+schema: 'db/api.graphql'
+documents: 'db/operations/**/*.graphql'
+generates:
+  src/generated-client.tsx:
+    config:
+      withHooks: true
+      withComponent: false
+      withHOC: false
+    plugins:
+      - 'typescript'
+      - 'typescript-react-apollo'
+      - 'typescript-operations'

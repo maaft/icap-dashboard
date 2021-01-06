@@ -1,0 +1,6 @@
+{
+  "watch": ["db/api.graphql", "db/operations/", "db/codegen.yml"],
+  "ext": "graphql,yml",
+  "exec": "echo \"Generating Client API ... \n\" && npx graphql-codegen --config db/codegen.yml; cd ethereum && go run github.com/maaft/gqlgenc",
+  "delay": "1000"
+}

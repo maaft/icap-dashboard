@@ -1,0 +1,221 @@
+query queryAccount {
+    queryAccount {
+        type
+        address
+        balances {
+          id
+            token {
+                name
+                ticker
+                nav
+                baseMultiplier
+            }
+            amount
+        }
+        stakes {
+          id
+            token {
+                name
+                ticker
+                nav
+                baseMultiplier
+            }
+            committedStakingPeriod
+            amount
+        }
+    }
+}
+
+subscription subscribeAccount {
+    queryAccount {
+        type
+        address
+        balances {
+          id
+            token {
+                name
+                ticker
+                nav
+                baseMultiplier
+            }
+            amount
+        }
+        stakes {
+          id
+            token {
+                name
+                ticker
+                nav
+                baseMultiplier
+            }
+            committedStakingPeriod
+            amount
+        }
+    }
+}
+
+query queryToken {
+  queryToken {
+    ticker
+    nav
+    name
+  }
+}
+
+subscription subscribeToken {
+  queryToken {
+    ticker
+    nav
+    name
+  }
+}
+
+query getAppState {
+   queryAppState {
+    transactionIds
+  }
+}
+
+query getStatistics {
+  queryAppState{
+    totalStakingPower
+    medianStakingPower
+    maxStakingPower
+  }
+}
+
+query GetAccount($address: String!) {
+  getAccount(address: $address){
+    type
+    stakes {
+      id
+      token {
+        name
+        ticker
+        nav
+      }
+      committedStakingPeriod
+      amount
+    }
+  }
+}
+
+mutation addAccount($input: AddAccountInput!) {
+  addAccount(input: [$input]) {
+    account {
+      address
+    }
+  }
+}
+
+mutation addTransaction($input: AddTransactionInput!) {
+  addTransaction(input: [$input]) {
+    transaction {
+      hash
+    }
+  }
+}
+
+query queryTransaction {
+  queryTransaction {
+    blockNumber
+    timeStamp
+    hash
+    nonce
+    blockHash
+    from
+    contractAddress
+    to
+    value
+    tokenName
+    tokenSymbol
+    tokenDecimal
+    transactionIndex
+    gas
+    gasPrice
+    gasUsed
+    cumulativeGasUsed
+    input
+    confirmations
+  }
+}
+
+mutation addAppState($input: AddAppStateInput!) {
+  addAppState(input: [$input]) {
+    appState {
+      _placeholder
+    }
+  }
+}
+
+
+mutation addToken($input: AddTokenInput!) {
+  addToken(input: [$input]) {
+    token {
+      ticker
+    }
+  }
+}
+
+mutation addBalance($input: AddBalanceInput!) {
+  addBalance(input: [$input]) {
+    balance {
+      id
+    }
+  }
+}
+
+mutation addStake($input: AddStakeInput!) {
+  addStake(input: [$input]) {
+    stake {
+      id
+    }
+  }
+}
+
+mutation updateAppState($set: AppStatePatch!) {
+  updateAppState(input: {
+    filter: {has: id}
+    set: $set
+  }) {
+    numUids
+  }
+}
+
+mutation updateToken($filter: TokenFilter!, $set: TokenPatch!) {
+  updateToken(input: {
+    filter: $filter
+    set: $set
+  }) {
+    token {
+      ticker
+      nav
+    }
+  }
+}
+
+mutation updateStake($filter: StakeFilter!, $set: StakePatch!) {
+  updateStake(input: {
+    filter: $filter
+    set: $set
+  }) {
+    numUids
+  }
+}
+
+mutation deleteStake($id: String!) {
+  deleteStake(filter: {
+    id: {eq: $id}
+  }) {
+    msg
+  }
+}
+
+mutation updateAccount($filter: AccountFilter!, $set: AccountPatch!) {
+  updateAccount(input: {
+    filter: $filter
+    set: $set
+  }) {
+    numUids
+  }
+}
