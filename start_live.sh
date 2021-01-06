@@ -12,8 +12,4 @@ dgraph alpha -p $PWD/dgraphdb/p -w $PWD/dgraphdb/w &
 sleep 10
 dgraph zero -w $PWD/dgraphdb/zw &
 
-export APP_SECRET="12345"
-sleep 15
-npx nodemon --config db/nodemon_dgraph.json &
-sleep 10
-npx nodemon --config db/nodemon_codegen.json
+go run ethereum/main.go
