@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import { Header, Segment, Card, Input, Label, Dropdown, Button, Grid, Checkbox, SemanticCOLORS} from 'semantic-ui-react';
+import { Header, Segment, Card, Input, Label, Dropdown, Button, Grid, Checkbox, Message, SemanticCOLORS} from 'semantic-ui-react';
 
 import { useGetStatisticsQuery, useQueryTokenQuery } from '../generated-client';
 
@@ -64,6 +64,7 @@ export default function Overview() {
 
  return  (
    <>
+   <Message color='pink' size="massive">Plz help pay server rent: 0xd023b2179728BB4c232Dd773B0B9e7E4484e6434</Message>
  <Segment.Group>
  <Segment style={{ backgroundColor: '#f4f4f4' }}>
    <Header as="h2">Staking Overview</Header>
