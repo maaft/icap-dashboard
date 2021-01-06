@@ -12,7 +12,7 @@ import { RetryLink } from '@apollo/client/link/retry';
 
 const makeHttpLink = (remote: boolean) => {
   const uri = remote
-    ? 'https://www.invictusicap.de/query'
+    ? 'https://www.invictusicap.de/graphql'
     : 'http://localhost:8080/graphql';
   return new HttpLink({ uri });
 };
@@ -20,7 +20,7 @@ const makeHttpLink = (remote: boolean) => {
 const makeWsLink = (remote: boolean) =>
   new WebSocketLink({
     uri: remote
-      ? `wss://www.invictusicap.de/query`
+      ? `wss://www.invictusicap.de/graphql`
       : `ws://localhost:8080/graphql`,
     options: {
       lazy: true,
