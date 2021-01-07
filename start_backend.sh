@@ -11,7 +11,6 @@ mkdir -p $ALPHA_PATH_W
 tilix -a session-add-right -e 'bash -i -c "dgraph alpha -p $PWD/dgraphdb/p -w $PWD/dgraphdb/w; sleep 10"'
 tilix -a session-add-right -e 'bash -i -c "dgraph zero -w $PWD/dgraphdb/zw"'
 
-export APP_SECRET="12345"
 sleep 15
 npx nodemon --config db/nodemon_dgraph.json &
 sleep 10
