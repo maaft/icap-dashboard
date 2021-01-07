@@ -1,15 +1,33 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
 import { Container } from 'semantic-ui-react'
-import Overview from './components/Overview'
+
+import StakingOverview from './components/StakingOverview'
+import StakingCalculator from './components/StakingCalculator'
+import TokenOverview from './components/TokenOverview'
+import TippingBanner from './components/TippingBanner'
+
+import { useGetStatisticsQuery, useQueryTokenQuery, useGetAccountQuery } from './generated-client';
+
 
 
 function App() {
+  const {data: statisticsData } = useGetStatisticsQuery({
+    pollInterval: 60000,
+  });
+
+
+  const {data: tokenData } = useQueryTokenQuery({
+    pollInterval: 60000,
+  });
+
   return (
     <>
     <Container style={{ marginTop: '15px' }}>
-         <Overview />
+      <TippingBanner />
+      <StakingOverview statisticsData={statisticsData} />
+      <TokenOverview tokenData={tokenData} />
+      <StakingCalculator statisticsData={statisticsData} tokenData={tokenData}/>
     </Container>
     </>
   );

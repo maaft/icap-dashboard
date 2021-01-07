@@ -99,6 +99,33 @@ type QueryAccount struct {
 		} "json:\"stakes\" graphql:\"stakes\""
 	} "json:\"queryAccount\" graphql:\"queryAccount\""
 }
+type GetAccount struct {
+	GetAccount *struct {
+		Type     AccountType "json:\"type\" graphql:\"type\""
+		Address  string      "json:\"address\" graphql:\"address\""
+		Balances []*struct {
+			ID    string "json:\"id\" graphql:\"id\""
+			Token struct {
+				Name           string  "json:\"name\" graphql:\"name\""
+				Ticker         string  "json:\"ticker\" graphql:\"ticker\""
+				Nav            float64 "json:\"nav\" graphql:\"nav\""
+				BaseMultiplier float64 "json:\"baseMultiplier\" graphql:\"baseMultiplier\""
+			} "json:\"token\" graphql:\"token\""
+			Amount float64 "json:\"amount\" graphql:\"amount\""
+		} "json:\"balances\" graphql:\"balances\""
+		Stakes []*struct {
+			ID    string "json:\"id\" graphql:\"id\""
+			Token struct {
+				Name           string  "json:\"name\" graphql:\"name\""
+				Ticker         string  "json:\"ticker\" graphql:\"ticker\""
+				Nav            float64 "json:\"nav\" graphql:\"nav\""
+				BaseMultiplier float64 "json:\"baseMultiplier\" graphql:\"baseMultiplier\""
+			} "json:\"token\" graphql:\"token\""
+			CommittedStakingPeriod int     "json:\"committedStakingPeriod\" graphql:\"committedStakingPeriod\""
+			Amount                 float64 "json:\"amount\" graphql:\"amount\""
+		} "json:\"stakes\" graphql:\"stakes\""
+	} "json:\"getAccount\" graphql:\"getAccount\""
+}
 type SubscribeAccount struct {
 	QueryAccount []*struct {
 		Type     AccountType "json:\"type\" graphql:\"type\""
@@ -152,22 +179,6 @@ type GetStatistics struct {
 		MedianStakingPower float64 "json:\"medianStakingPower\" graphql:\"medianStakingPower\""
 		MaxStakingPower    float64 "json:\"maxStakingPower\" graphql:\"maxStakingPower\""
 	} "json:\"queryAppState\" graphql:\"queryAppState\""
-}
-type GetAccount struct {
-	GetAccount *struct {
-		Type   AccountType "json:\"type\" graphql:\"type\""
-		Stakes []*struct {
-			ID    string "json:\"id\" graphql:\"id\""
-			Token struct {
-				Name           string  "json:\"name\" graphql:\"name\""
-				Ticker         string  "json:\"ticker\" graphql:\"ticker\""
-				Nav            float64 "json:\"nav\" graphql:\"nav\""
-				BaseMultiplier float64 "json:\"baseMultiplier\" graphql:\"baseMultiplier\""
-			} "json:\"token\" graphql:\"token\""
-			CommittedStakingPeriod int     "json:\"committedStakingPeriod\" graphql:\"committedStakingPeriod\""
-			Amount                 float64 "json:\"amount\" graphql:\"amount\""
-		} "json:\"stakes\" graphql:\"stakes\""
-	} "json:\"getAccount\" graphql:\"getAccount\""
 }
 type AddAccountClientPayload struct {
 	AddAccount *struct {
@@ -303,6 +314,48 @@ func (c *Client) QueryAccount(ctx context.Context, httpRequestOptions ...client.
 	return &res, nil
 }
 
+const GetAccountQuery = `query getAccount ($address: String!) {
+	getAccount(address: $address) {
+		type
+		address
+		balances {
+			id
+			token {
+				name
+				ticker
+				nav
+				baseMultiplier
+			}
+			amount
+		}
+		stakes {
+			id
+			token {
+				name
+				ticker
+				nav
+				baseMultiplier
+			}
+			committedStakingPeriod
+			amount
+		}
+	}
+}
+`
+
+func (c *Client) GetAccount(ctx context.Context, address string, httpRequestOptions ...client.HTTPRequestOption) (*GetAccount, error) {
+	vars := map[string]interface{}{
+		"address": address,
+	}
+
+	var res GetAccount
+	if err := c.Client.Post(ctx, GetAccountQuery, &res, vars, httpRequestOptions...); err != nil {
+		return nil, err
+	}
+
+	return &res, nil
+}
+
 const SubscribeAccountQuery = `subscription subscribeAccount {
 	queryAccount {
 		type
@@ -416,37 +469,6 @@ func (c *Client) GetStatistics(ctx context.Context, httpRequestOptions ...client
 
 	var res GetStatistics
 	if err := c.Client.Post(ctx, GetStatisticsQuery, &res, vars, httpRequestOptions...); err != nil {
-		return nil, err
-	}
-
-	return &res, nil
-}
-
-const GetAccountQuery = `query GetAccount ($address: String!) {
-	getAccount(address: $address) {
-		type
-		stakes {
-			id
-			token {
-				name
-				ticker
-				nav
-				baseMultiplier
-			}
-			committedStakingPeriod
-			amount
-		}
-	}
-}
-`
-
-func (c *Client) GetAccount(ctx context.Context, address string, httpRequestOptions ...client.HTTPRequestOption) (*GetAccount, error) {
-	vars := map[string]interface{}{
-		"address": address,
-	}
-
-	var res GetAccount
-	if err := c.Client.Post(ctx, GetAccountQuery, &res, vars, httpRequestOptions...); err != nil {
 		return nil, err
 	}
 

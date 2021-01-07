@@ -26,6 +26,34 @@ query queryAccount {
     }
 }
 
+query getAccount($address: String!) {
+    getAccount(address: $address) {
+        type
+        address
+        balances {
+          id
+            token {
+                name
+                ticker
+                nav
+                baseMultiplier
+            }
+            amount
+        }
+        stakes {
+          id
+            token {
+                name
+                ticker
+                nav
+                baseMultiplier
+            }
+            committedStakingPeriod
+            amount
+        }
+    }
+}
+
 subscription subscribeAccount {
     queryAccount {
         type
@@ -82,23 +110,6 @@ query getStatistics {
     totalStakingPower
     medianStakingPower
     maxStakingPower
-  }
-}
-
-query GetAccount($address: String!) {
-  getAccount(address: $address){
-    type
-    stakes {
-      id
-      token {
-        name
-        ticker
-        nav
-        baseMultiplier
-      }
-      committedStakingPeriod
-      amount
-    }
   }
 }
 

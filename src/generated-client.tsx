@@ -1890,6 +1890,61 @@ export function useQueryAccountLazyQuery(baseOptions?: Apollo.LazyQueryHookOptio
 export type QueryAccountQueryHookResult = ReturnType<typeof useQueryAccountQuery>;
 export type QueryAccountLazyQueryHookResult = ReturnType<typeof useQueryAccountLazyQuery>;
 export type QueryAccountQueryResult = Apollo.QueryResult<QueryAccountQuery, QueryAccountQueryVariables>;
+export const GetAccountDocument = gql`
+    query getAccount($address: String!) {
+  getAccount(address: $address) {
+    type
+    address
+    balances {
+      id
+      token {
+        name
+        ticker
+        nav
+        baseMultiplier
+      }
+      amount
+    }
+    stakes {
+      id
+      token {
+        name
+        ticker
+        nav
+        baseMultiplier
+      }
+      committedStakingPeriod
+      amount
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetAccountQuery__
+ *
+ * To run a query within a React component, call `useGetAccountQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAccountQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAccountQuery({
+ *   variables: {
+ *      address: // value for 'address'
+ *   },
+ * });
+ */
+export function useGetAccountQuery(baseOptions: Apollo.QueryHookOptions<GetAccountQuery, GetAccountQueryVariables>) {
+        return Apollo.useQuery<GetAccountQuery, GetAccountQueryVariables>(GetAccountDocument, baseOptions);
+      }
+export function useGetAccountLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAccountQuery, GetAccountQueryVariables>) {
+          return Apollo.useLazyQuery<GetAccountQuery, GetAccountQueryVariables>(GetAccountDocument, baseOptions);
+        }
+export type GetAccountQueryHookResult = ReturnType<typeof useGetAccountQuery>;
+export type GetAccountLazyQueryHookResult = ReturnType<typeof useGetAccountLazyQuery>;
+export type GetAccountQueryResult = Apollo.QueryResult<GetAccountQuery, GetAccountQueryVariables>;
 export const SubscribeAccountDocument = gql`
     subscription subscribeAccount {
   queryAccount {
@@ -2071,50 +2126,6 @@ export function useGetStatisticsLazyQuery(baseOptions?: Apollo.LazyQueryHookOpti
 export type GetStatisticsQueryHookResult = ReturnType<typeof useGetStatisticsQuery>;
 export type GetStatisticsLazyQueryHookResult = ReturnType<typeof useGetStatisticsLazyQuery>;
 export type GetStatisticsQueryResult = Apollo.QueryResult<GetStatisticsQuery, GetStatisticsQueryVariables>;
-export const GetAccountDocument = gql`
-    query GetAccount($address: String!) {
-  getAccount(address: $address) {
-    type
-    stakes {
-      id
-      token {
-        name
-        ticker
-        nav
-        baseMultiplier
-      }
-      committedStakingPeriod
-      amount
-    }
-  }
-}
-    `;
-
-/**
- * __useGetAccountQuery__
- *
- * To run a query within a React component, call `useGetAccountQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetAccountQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetAccountQuery({
- *   variables: {
- *      address: // value for 'address'
- *   },
- * });
- */
-export function useGetAccountQuery(baseOptions: Apollo.QueryHookOptions<GetAccountQuery, GetAccountQueryVariables>) {
-        return Apollo.useQuery<GetAccountQuery, GetAccountQueryVariables>(GetAccountDocument, baseOptions);
-      }
-export function useGetAccountLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAccountQuery, GetAccountQueryVariables>) {
-          return Apollo.useLazyQuery<GetAccountQuery, GetAccountQueryVariables>(GetAccountDocument, baseOptions);
-        }
-export type GetAccountQueryHookResult = ReturnType<typeof useGetAccountQuery>;
-export type GetAccountLazyQueryHookResult = ReturnType<typeof useGetAccountLazyQuery>;
-export type GetAccountQueryResult = Apollo.QueryResult<GetAccountQuery, GetAccountQueryVariables>;
 export const AddAccountDocument = gql`
     mutation addAccount($input: AddAccountInput!) {
   addAccount(input: [$input]) {
@@ -2561,6 +2572,34 @@ export type QueryAccountQuery = (
   )>>> }
 );
 
+export type GetAccountQueryVariables = Exact<{
+  address: Scalars['String'];
+}>;
+
+
+export type GetAccountQuery = (
+  { __typename?: 'Query' }
+  & { getAccount?: Maybe<(
+    { __typename?: 'Account' }
+    & Pick<Account, 'type' | 'address'>
+    & { balances: Array<(
+      { __typename?: 'Balance' }
+      & Pick<Balance, 'id' | 'amount'>
+      & { token: (
+        { __typename?: 'Token' }
+        & Pick<Token, 'name' | 'ticker' | 'nav' | 'baseMultiplier'>
+      ) }
+    )>, stakes: Array<(
+      { __typename?: 'Stake' }
+      & Pick<Stake, 'id' | 'committedStakingPeriod' | 'amount'>
+      & { token: (
+        { __typename?: 'Token' }
+        & Pick<Token, 'name' | 'ticker' | 'nav' | 'baseMultiplier'>
+      ) }
+    )> }
+  )> }
+);
+
 export type SubscribeAccountSubscriptionVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -2629,27 +2668,6 @@ export type GetStatisticsQuery = (
     { __typename?: 'AppState' }
     & Pick<AppState, 'totalStakingPower' | 'medianStakingPower' | 'maxStakingPower'>
   )>>> }
-);
-
-export type GetAccountQueryVariables = Exact<{
-  address: Scalars['String'];
-}>;
-
-
-export type GetAccountQuery = (
-  { __typename?: 'Query' }
-  & { getAccount?: Maybe<(
-    { __typename?: 'Account' }
-    & Pick<Account, 'type'>
-    & { stakes: Array<(
-      { __typename?: 'Stake' }
-      & Pick<Stake, 'id' | 'committedStakingPeriod' | 'amount'>
-      & { token: (
-        { __typename?: 'Token' }
-        & Pick<Token, 'name' | 'ticker' | 'nav' | 'baseMultiplier'>
-      ) }
-    )> }
-  )> }
 );
 
 export type AddAccountMutationVariables = Exact<{
