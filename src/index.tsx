@@ -77,7 +77,7 @@ const client = new ApolloClient({
 });
 
 ReactDOM.render(
-  <ApolloProvider client={clientLocal}>
+  <ApolloProvider client={clientRemote}>
     <React.StrictMode>
       <App />
     </React.StrictMode>,
