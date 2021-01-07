@@ -31,9 +31,13 @@ export default function StakingOverview({ statisticsData } : Props) {
    <>
 
  <Segment.Group>
- <Segment style={{ backgroundColor: '#f4f4f4' }}>
-   <Header as="h2">Staking Overview</Header>
- </Segment>
+ <Segment style={{ backgroundColor: 'rgba(255, 227, 248, 0.8)' }}>
+    <Grid>
+      <Grid.Column textAlign="center">
+        <Label size="massive" color={"yellow"} basic>Staking Overview</Label>
+      </Grid.Column>
+    </Grid>
+    </Segment>
  <Segment style={{ backgroundColor: 'rgba(52, 52, 52, 0.8)' }}>
     <Card.Group centered>
       <Card>

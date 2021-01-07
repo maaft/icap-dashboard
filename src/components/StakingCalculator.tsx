@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import { Header, Segment, Card, Input, Label, Dropdown, Checkbox, Message, TextArea, Form } from 'semantic-ui-react';
+import { Grid, Segment, Card, Input, Label, Dropdown, Checkbox, Message, TextArea, Form } from 'semantic-ui-react';
 
 import { useGetAccountQuery, QueryTokenQuery, GetStatisticsQuery } from '../generated-client';
 
@@ -96,9 +96,13 @@ export default function StakingCalculator({ statisticsData, tokenData } : Props)
 
     return (
         <Segment.Group>
-        <Segment style={{ backgroundColor: '#f4f4f4' }}>
-      <Header as="h2">Staking Calculator</Header>
-   </Segment>
+        <Segment style={{ backgroundColor: 'rgba(255, 227, 248, 0.8)' }}>
+    <Grid>
+      <Grid.Column textAlign="center">
+        <Label size="massive" color={"blue"} basic>Staking Calculator</Label>
+      </Grid.Column>
+    </Grid>
+    </Segment>
    <Segment style={{ backgroundColor: 'rgba(52, 52, 52, 0.8)' }}>
      <Form>
       <TextArea rows={1} placeholder='Enter your wallet address for auto-filling...' onChange={(event, data) => {setCurrentAddress(""+data.value)}}/>
