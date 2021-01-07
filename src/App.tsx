@@ -8,6 +8,7 @@ import TokenOverview from './components/TokenOverview'
 import TippingBanner from './components/TippingBanner'
 
 import { useGetStatisticsQuery, useQueryTokenQuery, useGetAccountQuery } from './generated-client';
+import Contribute from './components/Contribute';
 
 
 
@@ -28,6 +29,7 @@ function App() {
       <StakingOverview statisticsData={statisticsData} />
       <TokenOverview tokenData={tokenData} />
       <StakingCalculator statisticsData={statisticsData} tokenData={tokenData}/>
+      <Contribute/>
     </Container>
     </>
   );
