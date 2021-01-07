@@ -126,7 +126,7 @@ export default function StakingCalculator({ statisticsData, tokenData } : Props)
            }}>
            <Label color={TokenColors.get(token?.ticker || "IHF") || "pink"} basic>{token?.ticker}</Label>
            <input value={myStakes.get(token?.ticker || "")?.amount || 0} type="number"/>
-           <Dropdown placeholder='Months' options={stateOptions} onChange={(event, data) => {
+           <Dropdown value={myStakes.get(token?.ticker || "")?.committedStakingPeriod} placeholder='Months' options={stateOptions} onChange={(event, data) => {
              if (token) {
               const currentStake = myStakes.get(token.ticker)
             setMyStakes(new Map(myStakes.set(token.ticker, {...currentStake, committedStakingPeriod: parseInt(data.value as string)})))
