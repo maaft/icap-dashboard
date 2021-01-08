@@ -29,6 +29,29 @@ function App() {
       <StakingOverview statisticsData={statisticsData} />
       <TokenOverview tokenData={tokenData} />
       <StakingCalculator statisticsData={statisticsData} tokenData={tokenData}/>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
       <Contribute/>
     </Container>
     </>
