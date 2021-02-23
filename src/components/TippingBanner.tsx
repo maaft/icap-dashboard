@@ -5,6 +5,8 @@ import useClipboard from "react-use-clipboard";
 
 export default function TippingBanner() {
   const qfReferral = "Z977ZPH9";
+  const nanoAddress =
+    "nano_1td31cdyciwwocw7qi563gq37a865whjbi9r5qowngpjc8bqyxscu9dgtiu7";
   const btcAddress = "bc1qcdrz98p7w5yhxseyp079ye0tl5jsa6uc2vahwm";
   const ethAddress = "0xd023b2179728BB4c232Dd773B0B9e7E4484e6434";
   const adaAddress =
@@ -14,6 +16,9 @@ export default function TippingBanner() {
     successDuration: 1000,
   });
   const [isBtcCopied, setBtcCopied] = useClipboard(btcAddress, {
+    successDuration: 1000,
+  });
+  const [isnanoCopied, setnanoCopied] = useClipboard(nanoAddress, {
     successDuration: 1000,
   });
   const [isEthCopied, setEthCopied] = useClipboard(ethAddress, {
@@ -49,6 +54,23 @@ export default function TippingBanner() {
           }}
         >
           <Icon color="orange" name={!isqfCopied ? "copy outline" : "copy"} />
+        </Button>
+        <br />
+        <Label color={"brown"} basic>
+          NANO
+        </Label>{" "}
+        <Label color={"pink"} basic>
+          {nanoAddress}
+        </Label>
+        <Button
+          basic
+          icon
+          onClick={() => {
+            setnanoCopied();
+            return true;
+          }}
+        >
+          <Icon color="pink" name={!isnanoCopied ? "copy outline" : "copy"} />
         </Button>
         <br />
         <Label color={"yellow"} basic>
