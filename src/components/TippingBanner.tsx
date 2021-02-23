@@ -50,6 +50,7 @@ export default function TippingBanner() {
         >
           <Icon color="orange" name={!isqfCopied ? "copy outline" : "copy"} />
         </Button>
+        <br />
         <Label color={"yellow"} basic>
           BTC
         </Label>{" "}
