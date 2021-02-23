@@ -37,7 +37,9 @@ export default function TippingBanner() {
         <Label color={"red"} basic>
           Quantfury Referral Code
         </Label>{" "}
-        <Label color={"orange"} basic></Label>
+        <Label color={"orange"} basic>
+          {qfReferral}
+        </Label>
         <Button
           basic
           icon
