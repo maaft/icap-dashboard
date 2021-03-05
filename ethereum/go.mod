@@ -4,6 +4,7 @@ go 1.15
 
 require (
 	github.com/99designs/gqlgen v0.13.0
+	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/ethereum/go-ethereum v1.9.25
 	github.com/l0k18/float256 v0.0.0-20180517205256-2cb5bafe6ff6 // indirect

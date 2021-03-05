@@ -13,6 +13,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/lucsky/cuid"
 	"github.com/maaft/gqlgenc/client"
 	"github.com/maaft/invictusicap/auth"
@@ -144,6 +145,41 @@ type etherscanResponse struct {
 	Result  string `json:"result"`
 }
 
+func getTokenBalance(tokenAddress string, holderAddress string) float64 {
+	url := "https://api.etherscan.io/api?module=account&action=tokenbalance&contractaddress=" + tokenAddress + "&address=" + holderAddress + "&tag=latest&apikey=" + etherscanAPIKey
+	resp, err := http.Get(url)
+
+	if err != nil {
+		panic(err)
+	}
+
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		panic(err)
+	}
+
+	decoded := &etherscanResponse{}
+	err = json.Unmarshal(body, decoded)
+	if err != nil {
+		panic(err)
+	}
+
+	value, success := ethmath.ParseBig256(decoded.Result)
+	if !success {
+		panic("Can't parse uint256!")
+	}
+
+	mod := ethmath.U256(big.NewInt(0))
+
+	value.DivMod(value, denom, mod)
+
+	result := float64(value.Int64()) + float64(mod.Int64())/math.Pow(10, 18)
+
+	return result
+}
+
 func getAmountStaked(tokenAddress string, holderAddress string) float64 {
 	data := "0x" + getMethodID("userAmountStaked(address,address)")[:8] + padWithZeros(tokenAddress[2:]) + padWithZeros(holderAddress[2:])
 
@@ -256,6 +292,55 @@ type uniswapResult struct {
 }
 
 func updateDatabase(etherscanClient *etherscan.Client, dgraphClient *g.Client, appState *appState) error {
+
+	for _, tokenAddress := range tokenAddresses {
+		currentTicker := tickerFromAddress(tokenAddress)
+
+		for _, treasury := range treasuryContracts {
+			balance := getTokenBalance(string(tokenAddress), treasury)
+
+			existingAccount, err := dgraphClient.GetAccount(context.Background(), treasury)
+
+			if err != nil {
+				return err
+			}
+
+			spew.Dump(existingAccount)
+
+			foundBalance := false
+			balanceID := ""
+			for _, existingBalance := range existingAccount.GetAccount.Balances {
+				if existingBalance.Token.Ticker == currentTicker {
+					foundBalance = true
+					balanceID = existingBalance.ID
+				}
+			}
+			if foundBalance {
+				_, err := dgraphClient.UpdateBalance(context.Background(), balanceID, g.BalancePatch{
+					Amount: &balance,
+				})
+
+				if err != nil {
+					return err
+				}
+
+			} else {
+				_, err := dgraphClient.AddBalance(context.Background(), g.AddBalanceInput{
+					ID:     cuid.New(),
+					Token:  &g.TokenRef{Ticker: &currentTicker},
+					Amount: balance,
+					Owner:  &g.AccountRef{Address: &treasury},
+				})
+
+				if err != nil {
+					return err
+				}
+			}
+
+			time.Sleep(time.Millisecond * 200)
+		}
+	}
+
 	newTransactions := make([]etherscan.ERC20Transfer, 0)
 
 	for _, tokenAddress := range tokenAddresses {
@@ -580,6 +665,36 @@ func main() {
 	} else {
 		for _, txID := range appStates.QueryAppState[0].TransactionIds {
 			appState.TransactionIDs[txID] = true
+		}
+	}
+
+	treasuryAccounts, err := dgraphClient.GetTreasuryAccounts(context.Background())
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	if len(treasuryAccounts.QueryAccount) != len(treasuryContracts) {
+		for _, addr := range treasuryContracts {
+			found := false
+			for _, acc := range treasuryAccounts.QueryAccount {
+				if addr == acc.Address {
+					found = true
+				}
+			}
+
+			if !found {
+				_, err := dgraphClient.AddAccount(context.Background(), g.AddAccountInput{
+					Address:  addr,
+					Type:     g.AccountTypeTreasuryContract,
+					Stakes:   []*g.StakeRef{},
+					Balances: []*g.BalanceRef{},
+				})
+
+				if err != nil {
+					fmt.Println(err)
+				}
+			}
 		}
 	}
 

@@ -1023,7 +1023,6 @@ export type Query = {
   aggregateFoo?: Maybe<FooAggregateResult>;
   queryReadOnly?: Maybe<Array<Maybe<ReadOnly>>>;
   aggregateReadOnly?: Maybe<ReadOnlyAggregateResult>;
-  getCuid?: Maybe<Cuid>;
   queryCuid?: Maybe<Array<Maybe<Cuid>>>;
   aggregateCuid?: Maybe<CuidAggregateResult>;
   getToken?: Maybe<Token>;
@@ -1075,11 +1074,6 @@ export type QueryQueryReadOnlyArgs = {
 
 export type QueryAggregateReadOnlyArgs = {
   filter?: Maybe<ReadOnlyFilter>;
-};
-
-
-export type QueryGetCuidArgs = {
-  id: Scalars['String'];
 };
 
 
@@ -2448,6 +2442,39 @@ export function useUpdateTokenMutation(baseOptions?: Apollo.MutationHookOptions<
 export type UpdateTokenMutationHookResult = ReturnType<typeof useUpdateTokenMutation>;
 export type UpdateTokenMutationResult = Apollo.MutationResult<UpdateTokenMutation>;
 export type UpdateTokenMutationOptions = Apollo.BaseMutationOptions<UpdateTokenMutation, UpdateTokenMutationVariables>;
+export const UpdateBalanceDocument = gql`
+    mutation updateBalance($balanceId: String!, $set: BalancePatch!) {
+  updateBalance(input: {filter: {id: {eq: $balanceId}}, set: $set}) {
+    numUids
+  }
+}
+    `;
+export type UpdateBalanceMutationFn = Apollo.MutationFunction<UpdateBalanceMutation, UpdateBalanceMutationVariables>;
+
+/**
+ * __useUpdateBalanceMutation__
+ *
+ * To run a mutation, you first call `useUpdateBalanceMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateBalanceMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateBalanceMutation, { data, loading, error }] = useUpdateBalanceMutation({
+ *   variables: {
+ *      balanceId: // value for 'balanceId'
+ *      set: // value for 'set'
+ *   },
+ * });
+ */
+export function useUpdateBalanceMutation(baseOptions?: Apollo.MutationHookOptions<UpdateBalanceMutation, UpdateBalanceMutationVariables>) {
+        return Apollo.useMutation<UpdateBalanceMutation, UpdateBalanceMutationVariables>(UpdateBalanceDocument, baseOptions);
+      }
+export type UpdateBalanceMutationHookResult = ReturnType<typeof useUpdateBalanceMutation>;
+export type UpdateBalanceMutationResult = Apollo.MutationResult<UpdateBalanceMutation>;
+export type UpdateBalanceMutationOptions = Apollo.BaseMutationOptions<UpdateBalanceMutation, UpdateBalanceMutationVariables>;
 export const UpdateStakeDocument = gql`
     mutation updateStake($filter: StakeFilter!, $set: StakePatch!) {
   updateStake(input: {filter: $filter, set: $set}) {
@@ -2546,6 +2573,44 @@ export function useUpdateAccountMutation(baseOptions?: Apollo.MutationHookOption
 export type UpdateAccountMutationHookResult = ReturnType<typeof useUpdateAccountMutation>;
 export type UpdateAccountMutationResult = Apollo.MutationResult<UpdateAccountMutation>;
 export type UpdateAccountMutationOptions = Apollo.BaseMutationOptions<UpdateAccountMutation, UpdateAccountMutationVariables>;
+export const GetTreasuryAccountsDocument = gql`
+    query getTreasuryAccounts {
+  queryAccount(filter: {type: {eq: TreasuryContract}}) {
+    address
+    balances {
+      token {
+        nav
+      }
+      amount
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetTreasuryAccountsQuery__
+ *
+ * To run a query within a React component, call `useGetTreasuryAccountsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetTreasuryAccountsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetTreasuryAccountsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetTreasuryAccountsQuery(baseOptions?: Apollo.QueryHookOptions<GetTreasuryAccountsQuery, GetTreasuryAccountsQueryVariables>) {
+        return Apollo.useQuery<GetTreasuryAccountsQuery, GetTreasuryAccountsQueryVariables>(GetTreasuryAccountsDocument, baseOptions);
+      }
+export function useGetTreasuryAccountsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetTreasuryAccountsQuery, GetTreasuryAccountsQueryVariables>) {
+          return Apollo.useLazyQuery<GetTreasuryAccountsQuery, GetTreasuryAccountsQueryVariables>(GetTreasuryAccountsDocument, baseOptions);
+        }
+export type GetTreasuryAccountsQueryHookResult = ReturnType<typeof useGetTreasuryAccountsQuery>;
+export type GetTreasuryAccountsLazyQueryHookResult = ReturnType<typeof useGetTreasuryAccountsLazyQuery>;
+export type GetTreasuryAccountsQueryResult = Apollo.QueryResult<GetTreasuryAccountsQuery, GetTreasuryAccountsQueryVariables>;
 export type QueryAccountQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -2807,6 +2872,20 @@ export type UpdateTokenMutation = (
   )> }
 );
 
+export type UpdateBalanceMutationVariables = Exact<{
+  balanceId: Scalars['String'];
+  set: BalancePatch;
+}>;
+
+
+export type UpdateBalanceMutation = (
+  { __typename?: 'Mutation' }
+  & { updateBalance?: Maybe<(
+    { __typename?: 'UpdateBalancePayload' }
+    & Pick<UpdateBalancePayload, 'numUids'>
+  )> }
+);
+
 export type UpdateStakeMutationVariables = Exact<{
   filter: StakeFilter;
   set: StakePatch;
@@ -2846,4 +2925,23 @@ export type UpdateAccountMutation = (
     { __typename?: 'UpdateAccountPayload' }
     & Pick<UpdateAccountPayload, 'numUids'>
   )> }
+);
+
+export type GetTreasuryAccountsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetTreasuryAccountsQuery = (
+  { __typename?: 'Query' }
+  & { queryAccount?: Maybe<Array<Maybe<(
+    { __typename?: 'Account' }
+    & Pick<Account, 'address'>
+    & { balances: Array<(
+      { __typename?: 'Balance' }
+      & Pick<Balance, 'amount'>
+      & { token: (
+        { __typename?: 'Token' }
+        & Pick<Token, 'nav'>
+      ) }
+    )> }
+  )>>> }
 );

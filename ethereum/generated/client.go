@@ -23,7 +23,6 @@ type Query struct {
 	AggregateFoo         *FooAggregateResult         "json:\"aggregateFoo\" graphql:\"aggregateFoo\""
 	QueryReadOnly        []ReadOnly                  "json:\"queryReadOnly\" graphql:\"queryReadOnly\""
 	AggregateReadOnly    *ReadOnlyAggregateResult    "json:\"aggregateReadOnly\" graphql:\"aggregateReadOnly\""
-	GetCuid              Cuid                        "json:\"getCuid\" graphql:\"getCuid\""
 	QueryCuid            []Cuid                      "json:\"queryCuid\" graphql:\"queryCuid\""
 	AggregateCuid        *CuidAggregateResult        "json:\"aggregateCuid\" graphql:\"aggregateCuid\""
 	GetToken             *Token                      "json:\"getToken\" graphql:\"getToken\""
@@ -258,6 +257,11 @@ type UpdateTokenClientPayload struct {
 		} "json:\"token\" graphql:\"token\""
 	} "json:\"updateToken\" graphql:\"updateToken\""
 }
+type UpdateBalanceClientPayload struct {
+	UpdateBalance *struct {
+		NumUids *int "json:\"numUids\" graphql:\"numUids\""
+	} "json:\"updateBalance\" graphql:\"updateBalance\""
+}
 type UpdateStakeClientPayload struct {
 	UpdateStake *struct {
 		NumUids *int "json:\"numUids\" graphql:\"numUids\""
@@ -272,6 +276,17 @@ type UpdateAccountClientPayload struct {
 	UpdateAccount *struct {
 		NumUids *int "json:\"numUids\" graphql:\"numUids\""
 	} "json:\"updateAccount\" graphql:\"updateAccount\""
+}
+type GetTreasuryAccounts struct {
+	QueryAccount []*struct {
+		Address  string "json:\"address\" graphql:\"address\""
+		Balances []*struct {
+			Token struct {
+				Nav float64 "json:\"nav\" graphql:\"nav\""
+			} "json:\"token\" graphql:\"token\""
+			Amount float64 "json:\"amount\" graphql:\"amount\""
+		} "json:\"balances\" graphql:\"balances\""
+	} "json:\"queryAccount\" graphql:\"queryAccount\""
 }
 
 const QueryAccountQuery = `query queryAccount {
@@ -687,6 +702,27 @@ func (c *Client) UpdateToken(ctx context.Context, filter TokenFilter, set TokenP
 	return &res, nil
 }
 
+const UpdateBalanceQuery = `mutation updateBalance ($balanceId: String!, $set: BalancePatch!) {
+	updateBalance(input: {filter:{id:{eq:$balanceId}},set:$set}) {
+		numUids
+	}
+}
+`
+
+func (c *Client) UpdateBalance(ctx context.Context, balanceID string, set BalancePatch, httpRequestOptions ...client.HTTPRequestOption) (*UpdateBalanceClientPayload, error) {
+	vars := map[string]interface{}{
+		"balanceId": balanceID,
+		"set":       set,
+	}
+
+	var res UpdateBalanceClientPayload
+	if err := c.Client.Post(ctx, UpdateBalanceQuery, &res, vars, httpRequestOptions...); err != nil {
+		return nil, err
+	}
+
+	return &res, nil
+}
+
 const UpdateStakeQuery = `mutation updateStake ($filter: StakeFilter!, $set: StakePatch!) {
 	updateStake(input: {filter:$filter,set:$set}) {
 		numUids
@@ -743,6 +779,30 @@ func (c *Client) UpdateAccount(ctx context.Context, filter AccountFilter, set Ac
 
 	var res UpdateAccountClientPayload
 	if err := c.Client.Post(ctx, UpdateAccountQuery, &res, vars, httpRequestOptions...); err != nil {
+		return nil, err
+	}
+
+	return &res, nil
+}
+
+const GetTreasuryAccountsQuery = `query getTreasuryAccounts {
+	queryAccount(filter: {type:{eq:TreasuryContract}}) {
+		address
+		balances {
+			token {
+				nav
+			}
+			amount
+		}
+	}
+}
+`
+
+func (c *Client) GetTreasuryAccounts(ctx context.Context, httpRequestOptions ...client.HTTPRequestOption) (*GetTreasuryAccounts, error) {
+	vars := map[string]interface{}{}
+
+	var res GetTreasuryAccounts
+	if err := c.Client.Post(ctx, GetTreasuryAccountsQuery, &res, vars, httpRequestOptions...); err != nil {
 		return nil, err
 	}
 

@@ -10,7 +10,7 @@ import TippingBanner from "./components/TippingBanner";
 import {
   useGetStatisticsQuery,
   useQueryTokenQuery,
-  useGetAccountQuery,
+  useGetTreasuryAccountsQuery
 } from "./generated-client";
 import Contribute from "./components/Contribute";
 import ToS from "./components/ToS";
@@ -24,11 +24,13 @@ function App() {
     pollInterval: 60000,
   });
 
+  const { data: treasuryAccounts } = useGetTreasuryAccountsQuery()
+
   return (
     <>
       <Container style={{ marginTop: "15px" }}>
         <TippingBanner />
-        <StakingOverview statisticsData={statisticsData} />
+        <StakingOverview statisticsData={statisticsData} tokenData={tokenData} treasuryAccounts={treasuryAccounts}/>
         <TokenOverview tokenData={tokenData} />
         <StakingCalculator
           statisticsData={statisticsData}

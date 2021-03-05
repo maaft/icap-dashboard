@@ -207,6 +207,17 @@ mutation updateToken($filter: TokenFilter!, $set: TokenPatch!) {
   }
 }
 
+mutation updateBalance($balanceId: String!, $set: BalancePatch!) {
+  updateBalance(input: {
+    filter: {
+      id: {eq: $balanceId}
+    }
+    set: $set
+  }) {
+    numUids
+  }
+}
+
 mutation updateStake($filter: StakeFilter!, $set: StakePatch!) {
   updateStake(input: {
     filter: $filter
@@ -230,5 +241,19 @@ mutation updateAccount($filter: AccountFilter!, $set: AccountPatch!) {
     set: $set
   }) {
     numUids
+  }
+}
+
+query getTreasuryAccounts {
+  queryAccount(filter: {
+    type: {eq: TreasuryContract}
+  }) {
+    address
+    balances {
+      token {
+        nav
+      }
+      amount
+    }
   }
 }

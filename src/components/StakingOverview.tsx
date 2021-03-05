@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 import { Header, Segment, Card, Input, Label, Dropdown, Button, Grid, Checkbox, Message, TextArea, Form, SemanticCOLORS} from 'semantic-ui-react';
 
-import { GetStatisticsQuery } from '../generated-client';
+import { GetStatisticsQuery, GetTreasuryAccountsQuery, QueryTokenQuery } from '../generated-client';
 
 import {TokenColors} from '../util'
 
@@ -12,9 +12,11 @@ import TippingBanner from './TippingBanner'
 
 type Props = {
   statisticsData: GetStatisticsQuery | undefined;
+  tokenData: QueryTokenQuery | undefined;
+  treasuryAccounts: GetTreasuryAccountsQuery | undefined;
 }
 
-export default function StakingOverview({ statisticsData } : Props) {
+export default function StakingOverview({ statisticsData, tokenData, treasuryAccounts } : Props) {
   let totalPower = 0
   let maxPower = 0;
   let medianPower = 0;
@@ -26,6 +28,13 @@ export default function StakingOverview({ statisticsData } : Props) {
       medianPower = statisticsData.queryAppState[0].medianStakingPower
     }
   }
+
+  
+  const treasuryValue = treasuryAccounts?.queryAccount?.reduce((acc, account) => {
+    const accountValue = account?.balances.reduce((balAcc, bal) => balAcc + bal.amount * bal.token.nav, 0) || 0
+    return acc + accountValue;
+  }, 0) || 0;
+
 
  return  (
    <>
@@ -72,6 +81,18 @@ export default function StakingOverview({ statisticsData } : Props) {
           <Grid>
             <Grid.Column textAlign="center">
               <Button size={"massive"} color='pink'>${medianPower.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Button>
+            </Grid.Column>
+          </Grid>
+        </Card.Content>
+      </Card>
+      <Card>
+        <Card.Content>
+          <Card.Header>Treasury Value</Card.Header>
+        </Card.Content>
+        <Card.Content extra>
+          <Grid>
+            <Grid.Column textAlign="center">
+              <Button size={"massive"} color='pink'>${treasuryValue.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Button>
             </Grid.Column>
           </Grid>
         </Card.Content>

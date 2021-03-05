@@ -1,28 +1,28 @@
-directive @id on FIELD_DEFINITION
-
-directive @secret(field: String!, pred: String) on OBJECT | INTERFACE
-
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT | INTERFACE
-
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT | INTERFACE
+directive @dgraph(type: String, pred: String) on OBJECT | INTERFACE | FIELD_DEFINITION
 
 directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
+directive @remote on OBJECT | INTERFACE | UNION | INPUT_OBJECT | ENUM
+
 directive @lambda on FIELD_DEFINITION
-
-directive @dgraph(type: String, pred: String) on OBJECT | INTERFACE | FIELD_DEFINITION
-
-directive @withSubscription on OBJECT | INTERFACE
-
-directive @cacheControl(maxAge: Int!) on QUERY
 
 directive @hasInverse(field: String!) on FIELD_DEFINITION
 
+directive @secret(field: String!, pred: String) on OBJECT | INTERFACE
+
 directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
-directive @remote on OBJECT | INTERFACE | UNION | INPUT_OBJECT | ENUM
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT | INTERFACE
 
 directive @cascade(fields: [String]) on FIELD
+
+directive @cacheControl(maxAge: Int!) on QUERY
+
+directive @id on FIELD_DEFINITION
+
+directive @withSubscription on OBJECT | INTERFACE
+
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT | INTERFACE
 
 type Account implements ReadOnly {
   _placeholder: String
@@ -706,7 +706,6 @@ type Query {
   aggregateFoo(filter: FooFilter): FooAggregateResult
   queryReadOnly(filter: ReadOnlyFilter, order: ReadOnlyOrder, first: Int, offset: Int): [ReadOnly]
   aggregateReadOnly(filter: ReadOnlyFilter): ReadOnlyAggregateResult
-  getCuid(id: String!): Cuid
   queryCuid(filter: CuidFilter, order: CuidOrder, first: Int, offset: Int): [Cuid]
   aggregateCuid(filter: CuidFilter): CuidAggregateResult
   getToken(ticker: String!): Token
