@@ -13,7 +13,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/lucsky/cuid"
 	"github.com/maaft/gqlgenc/client"
 	"github.com/maaft/invictusicap/auth"
@@ -304,8 +303,6 @@ func updateDatabase(etherscanClient *etherscan.Client, dgraphClient *g.Client, a
 			if err != nil {
 				return err
 			}
-
-			spew.Dump(existingAccount)
 
 			foundBalance := false
 			balanceID := ""
