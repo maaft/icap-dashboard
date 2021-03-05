@@ -92,7 +92,7 @@ export default function StakingOverview({ statisticsData, tokenData, treasuryAcc
         <Card.Content extra>
           <Grid>
             <Grid.Column textAlign="center">
-              <Button size={"massive"} color='pink'>${treasuryValue.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Button>
+              <Button size={"massive"} color='pink' data-tooltip="aggregated value from all treasury contracts">${treasuryValue.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Button>
             </Grid.Column>
           </Grid>
         </Card.Content>
