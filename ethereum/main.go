@@ -144,25 +144,25 @@ type etherscanResponse struct {
 	Result  string `json:"result"`
 }
 
-func getTokenBalance(tokenAddress string, holderAddress string) float64 {
+func getTokenBalance(tokenAddress string, holderAddress string) (float64, error) {
 	url := "https://api.etherscan.io/api?module=account&action=tokenbalance&contractaddress=" + tokenAddress + "&address=" + holderAddress + "&tag=latest&apikey=" + etherscanAPIKey
 	resp, err := http.Get(url)
 
 	if err != nil {
-		panic(err)
+		return 0, err
 	}
 
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		panic(err)
+		return 0, err
 	}
 
 	decoded := &etherscanResponse{}
 	err = json.Unmarshal(body, decoded)
 	if err != nil {
-		panic(err)
+		return 0, err
 	}
 
 	value, success := ethmath.ParseBig256(decoded.Result)
@@ -176,30 +176,30 @@ func getTokenBalance(tokenAddress string, holderAddress string) float64 {
 
 	result := float64(value.Int64()) + float64(mod.Int64())/math.Pow(10, 18)
 
-	return result
+	return result, nil
 }
 
-func getAmountStaked(tokenAddress string, holderAddress string) float64 {
+func getAmountStaked(tokenAddress string, holderAddress string) (float64, error) {
 	data := "0x" + getMethodID("userAmountStaked(address,address)")[:8] + padWithZeros(tokenAddress[2:]) + padWithZeros(holderAddress[2:])
 
 	url := "https://api.etherscan.io/api?module=proxy&action=eth_call&to=" + stakingContract + "&data=" + data + "&tag=latest&apikey=" + etherscanAPIKey
 	resp, err := http.Get(url)
 
 	if err != nil {
-		panic(err)
+		return 0, err
 	}
 
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		panic(err)
+		return 0, err
 	}
 
 	decoded := &etherscanResponse{}
 	err = json.Unmarshal(body, decoded)
 	if err != nil {
-		panic(err)
+		return 0, err
 	}
 
 	value, success := ethmath.ParseBig256(decoded.Result)
@@ -213,30 +213,30 @@ func getAmountStaked(tokenAddress string, holderAddress string) float64 {
 
 	result := float64(value.Int64()) + float64(mod.Int64())/math.Pow(10, 18)
 
-	return result
+	return result, nil
 }
 
-func getCommittedStakingPeriod(tokenAddress string, holderAddress string) int {
+func getCommittedStakingPeriod(tokenAddress string, holderAddress string) (int, error) {
 	data := "0x" + getMethodID("userCommittedStakingPeriod(address,address)")[:8] + padWithZeros(tokenAddress[2:]) + padWithZeros(holderAddress[2:])
 
 	url := "https://api.etherscan.io/api?module=proxy&action=eth_call&to=" + stakingContract + "&data=" + data + "&tag=latest&apikey=" + etherscanAPIKey
 	resp, err := http.Get(url)
 
 	if err != nil {
-		panic(err)
+		return 0, err
 	}
 
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		panic(err)
+		return 0, err
 	}
 
 	decoded := &etherscanResponse{}
 	err = json.Unmarshal(body, decoded)
 	if err != nil {
-		panic(err)
+		return 0, err
 	}
 
 	value, success := ethmath.ParseBig256(decoded.Result)
@@ -244,7 +244,7 @@ func getCommittedStakingPeriod(tokenAddress string, holderAddress string) int {
 		panic("Can't parse uint256!")
 	}
 
-	return int(value.Int64())
+	return int(value.Int64()), nil
 }
 
 type navData struct {
@@ -329,7 +329,12 @@ func updateDatabase(etherscanClient *etherscan.Client, dgraphClient *g.Client, a
 		currentTicker := tickerFromAddress(tokenAddress)
 
 		for _, treasury := range treasuryContracts {
-			balance := getTokenBalance(string(tokenAddress), treasury)
+			balance, err := getTokenBalance(string(tokenAddress), treasury)
+			if err != nil {
+				fmt.Println(err)
+				time.Sleep(time.Millisecond * 200)
+				continue
+			}
 
 			existingAccount, err := dgraphClient.GetAccount(context.Background(), treasury)
 
@@ -406,11 +411,18 @@ func updateDatabase(etherscanClient *etherscan.Client, dgraphClient *g.Client, a
 
 		ticker := tickerFromAddress(tokenAddress(tx.ContractAddress))
 
-		amount := getAmountStaked(tx.ContractAddress, holderAddress)
+		amount, err := getAmountStaked(tx.ContractAddress, holderAddress)
 		time.Sleep(time.Millisecond * 200)
-		stakingPeriod := getCommittedStakingPeriod(tx.ContractAddress, holderAddress)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+		stakingPeriod, err := getCommittedStakingPeriod(tx.ContractAddress, holderAddress)
 		time.Sleep(time.Millisecond * 200)
-
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
 		existingAccount, err := dgraphClient.GetAccount(context.Background(), holderAddress)
 
 		if err != nil {
