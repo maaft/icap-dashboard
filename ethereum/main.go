@@ -284,6 +284,39 @@ func getNav() (map[string]float64, error) {
 	return result, nil
 }
 
+type ethResult struct {
+	Status int `json:"status,string"`
+	Result struct {
+		Price float64 `json:"ethusd,string"`
+	} `json:"result"`
+}
+
+func getETHPrice() (float64, error) {
+	resp, err := http.Get("https://api.etherscan.io/api?module=stats&action=ethprice&apikey=" + etherscanAPIKey)
+	if err != nil {
+		return 0, err
+	}
+
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return 0, err
+	}
+
+	decoded := ethResult{}
+	err = json.Unmarshal(body, &decoded)
+	if err != nil {
+		return 0, err
+	}
+
+	if decoded.Status == 0 {
+		return 0, err
+	}
+
+	return decoded.Result.Price, nil
+}
+
 type uniswapResult struct {
 	Pair *struct {
 		Price string `json:"price" graphql:"price"`
@@ -495,6 +528,20 @@ func updateDatabase(etherscanClient *etherscan.Client, dgraphClient *g.Client, a
 }
 
 func updatePrices(dgraphClient *g.Client, uniswapClient *client.Client) error {
+	ethPrice, err := getETHPrice()
+
+	if err != nil {
+		return err
+	}
+
+	_, err = dgraphClient.SetEthPrice(context.Background(), ethPrice)
+
+	if err != nil {
+		return err
+	}
+
+	time.Sleep(time.Millisecond * 200)
+
 	// get Invictus prices
 	navResult, err := getNav()
 

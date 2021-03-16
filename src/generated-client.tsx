@@ -166,6 +166,7 @@ export type AddAppStateInput = {
   totalStakingPower: Scalars['Float'];
   medianStakingPower: Scalars['Float'];
   maxStakingPower: Scalars['Float'];
+  ethPrice: Scalars['Float'];
 };
 
 export type AddAppStatePayload = {
@@ -313,6 +314,7 @@ export type AppState = Cuid & ReadOnly & {
   totalStakingPower: Scalars['Float'];
   medianStakingPower: Scalars['Float'];
   maxStakingPower: Scalars['Float'];
+  ethPrice: Scalars['Float'];
 };
 
 export type AppStateAggregateResult = {
@@ -334,6 +336,10 @@ export type AppStateAggregateResult = {
   maxStakingPowerMax?: Maybe<Scalars['Float']>;
   maxStakingPowerSum?: Maybe<Scalars['Float']>;
   maxStakingPowerAvg?: Maybe<Scalars['Float']>;
+  ethPriceMin?: Maybe<Scalars['Float']>;
+  ethPriceMax?: Maybe<Scalars['Float']>;
+  ethPriceSum?: Maybe<Scalars['Float']>;
+  ethPriceAvg?: Maybe<Scalars['Float']>;
 };
 
 export type AppStateFilter = {
@@ -351,7 +357,8 @@ export enum AppStateHasFilter {
   TransactionIds = 'transactionIds',
   TotalStakingPower = 'totalStakingPower',
   MedianStakingPower = 'medianStakingPower',
-  MaxStakingPower = 'maxStakingPower'
+  MaxStakingPower = 'maxStakingPower',
+  EthPrice = 'ethPrice'
 }
 
 export type AppStateOrder = {
@@ -365,7 +372,8 @@ export enum AppStateOrderable {
   Id = 'id',
   TotalStakingPower = 'totalStakingPower',
   MedianStakingPower = 'medianStakingPower',
-  MaxStakingPower = 'maxStakingPower'
+  MaxStakingPower = 'maxStakingPower',
+  EthPrice = 'ethPrice'
 }
 
 export type AppStatePatch = {
@@ -374,6 +382,7 @@ export type AppStatePatch = {
   totalStakingPower?: Maybe<Scalars['Float']>;
   medianStakingPower?: Maybe<Scalars['Float']>;
   maxStakingPower?: Maybe<Scalars['Float']>;
+  ethPrice?: Maybe<Scalars['Float']>;
 };
 
 export type AppStateRef = {
@@ -383,6 +392,7 @@ export type AppStateRef = {
   totalStakingPower?: Maybe<Scalars['Float']>;
   medianStakingPower?: Maybe<Scalars['Float']>;
   maxStakingPower?: Maybe<Scalars['Float']>;
+  ethPrice?: Maybe<Scalars['Float']>;
 };
 
 export type AuthRule = {
@@ -2086,6 +2096,70 @@ export function useGetAppStateLazyQuery(baseOptions?: Apollo.LazyQueryHookOption
 export type GetAppStateQueryHookResult = ReturnType<typeof useGetAppStateQuery>;
 export type GetAppStateLazyQueryHookResult = ReturnType<typeof useGetAppStateLazyQuery>;
 export type GetAppStateQueryResult = Apollo.QueryResult<GetAppStateQuery, GetAppStateQueryVariables>;
+export const SetEthPriceDocument = gql`
+    mutation setEthPrice($price: Float!) {
+  updateAppState(input: {filter: {has: maxStakingPower}, set: {ethPrice: $price}}) {
+    numUids
+  }
+}
+    `;
+export type SetEthPriceMutationFn = Apollo.MutationFunction<SetEthPriceMutation, SetEthPriceMutationVariables>;
+
+/**
+ * __useSetEthPriceMutation__
+ *
+ * To run a mutation, you first call `useSetEthPriceMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSetEthPriceMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [setEthPriceMutation, { data, loading, error }] = useSetEthPriceMutation({
+ *   variables: {
+ *      price: // value for 'price'
+ *   },
+ * });
+ */
+export function useSetEthPriceMutation(baseOptions?: Apollo.MutationHookOptions<SetEthPriceMutation, SetEthPriceMutationVariables>) {
+        return Apollo.useMutation<SetEthPriceMutation, SetEthPriceMutationVariables>(SetEthPriceDocument, baseOptions);
+      }
+export type SetEthPriceMutationHookResult = ReturnType<typeof useSetEthPriceMutation>;
+export type SetEthPriceMutationResult = Apollo.MutationResult<SetEthPriceMutation>;
+export type SetEthPriceMutationOptions = Apollo.BaseMutationOptions<SetEthPriceMutation, SetEthPriceMutationVariables>;
+export const GetEthPriceDocument = gql`
+    query getEthPrice {
+  queryAppState {
+    ethPrice
+  }
+}
+    `;
+
+/**
+ * __useGetEthPriceQuery__
+ *
+ * To run a query within a React component, call `useGetEthPriceQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetEthPriceQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetEthPriceQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetEthPriceQuery(baseOptions?: Apollo.QueryHookOptions<GetEthPriceQuery, GetEthPriceQueryVariables>) {
+        return Apollo.useQuery<GetEthPriceQuery, GetEthPriceQueryVariables>(GetEthPriceDocument, baseOptions);
+      }
+export function useGetEthPriceLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetEthPriceQuery, GetEthPriceQueryVariables>) {
+          return Apollo.useLazyQuery<GetEthPriceQuery, GetEthPriceQueryVariables>(GetEthPriceDocument, baseOptions);
+        }
+export type GetEthPriceQueryHookResult = ReturnType<typeof useGetEthPriceQuery>;
+export type GetEthPriceLazyQueryHookResult = ReturnType<typeof useGetEthPriceLazyQuery>;
+export type GetEthPriceQueryResult = Apollo.QueryResult<GetEthPriceQuery, GetEthPriceQueryVariables>;
 export const GetStatisticsDocument = gql`
     query getStatistics {
   queryAppState {
@@ -2721,6 +2795,30 @@ export type GetAppStateQuery = (
   & { queryAppState?: Maybe<Array<Maybe<(
     { __typename?: 'AppState' }
     & Pick<AppState, 'transactionIds'>
+  )>>> }
+);
+
+export type SetEthPriceMutationVariables = Exact<{
+  price: Scalars['Float'];
+}>;
+
+
+export type SetEthPriceMutation = (
+  { __typename?: 'Mutation' }
+  & { updateAppState?: Maybe<(
+    { __typename?: 'UpdateAppStatePayload' }
+    & Pick<UpdateAppStatePayload, 'numUids'>
+  )> }
+);
+
+export type GetEthPriceQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetEthPriceQuery = (
+  { __typename?: 'Query' }
+  & { queryAppState?: Maybe<Array<Maybe<(
+    { __typename?: 'AppState' }
+    & Pick<AppState, 'ethPrice'>
   )>>> }
 );
 

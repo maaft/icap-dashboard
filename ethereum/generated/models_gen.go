@@ -91,6 +91,7 @@ type AddAppStateInput struct {
 	TotalStakingPower  float64  `json:"totalStakingPower"`
 	MedianStakingPower float64  `json:"medianStakingPower"`
 	MaxStakingPower    float64  `json:"maxStakingPower"`
+	EthPrice           float64  `json:"ethPrice"`
 }
 
 type AddAppStatePayload struct {
@@ -183,6 +184,7 @@ type AppState struct {
 	TotalStakingPower  float64  `json:"totalStakingPower"`
 	MedianStakingPower float64  `json:"medianStakingPower"`
 	MaxStakingPower    float64  `json:"maxStakingPower"`
+	EthPrice           float64  `json:"ethPrice"`
 }
 
 func (AppState) IsCuid()     {}
@@ -206,6 +208,10 @@ type AppStateAggregateResult struct {
 	MaxStakingPowerMax    *float64 `json:"maxStakingPowerMax"`
 	MaxStakingPowerSum    *float64 `json:"maxStakingPowerSum"`
 	MaxStakingPowerAvg    *float64 `json:"maxStakingPowerAvg"`
+	EthPriceMin           *float64 `json:"ethPriceMin"`
+	EthPriceMax           *float64 `json:"ethPriceMax"`
+	EthPriceSum           *float64 `json:"ethPriceSum"`
+	EthPriceAvg           *float64 `json:"ethPriceAvg"`
 }
 
 type AppStateFilter struct {
@@ -229,6 +235,7 @@ type AppStatePatch struct {
 	TotalStakingPower  *float64 `json:"totalStakingPower"`
 	MedianStakingPower *float64 `json:"medianStakingPower"`
 	MaxStakingPower    *float64 `json:"maxStakingPower"`
+	EthPrice           *float64 `json:"ethPrice"`
 }
 
 type AppStateRef struct {
@@ -238,6 +245,7 @@ type AppStateRef struct {
 	TotalStakingPower  *float64 `json:"totalStakingPower"`
 	MedianStakingPower *float64 `json:"medianStakingPower"`
 	MaxStakingPower    *float64 `json:"maxStakingPower"`
+	EthPrice           *float64 `json:"ethPrice"`
 }
 
 type AuthRule struct {
@@ -1106,6 +1114,7 @@ const (
 	AppStateHasFilterTotalStakingPower  AppStateHasFilter = "totalStakingPower"
 	AppStateHasFilterMedianStakingPower AppStateHasFilter = "medianStakingPower"
 	AppStateHasFilterMaxStakingPower    AppStateHasFilter = "maxStakingPower"
+	AppStateHasFilterEthPrice           AppStateHasFilter = "ethPrice"
 )
 
 var AllAppStateHasFilter = []AppStateHasFilter{
@@ -1115,11 +1124,12 @@ var AllAppStateHasFilter = []AppStateHasFilter{
 	AppStateHasFilterTotalStakingPower,
 	AppStateHasFilterMedianStakingPower,
 	AppStateHasFilterMaxStakingPower,
+	AppStateHasFilterEthPrice,
 }
 
 func (e AppStateHasFilter) IsValid() bool {
 	switch e {
-	case AppStateHasFilterPlaceholder, AppStateHasFilterID, AppStateHasFilterTransactionIds, AppStateHasFilterTotalStakingPower, AppStateHasFilterMedianStakingPower, AppStateHasFilterMaxStakingPower:
+	case AppStateHasFilterPlaceholder, AppStateHasFilterID, AppStateHasFilterTransactionIds, AppStateHasFilterTotalStakingPower, AppStateHasFilterMedianStakingPower, AppStateHasFilterMaxStakingPower, AppStateHasFilterEthPrice:
 		return true
 	}
 	return false
@@ -1154,6 +1164,7 @@ const (
 	AppStateOrderableTotalStakingPower  AppStateOrderable = "totalStakingPower"
 	AppStateOrderableMedianStakingPower AppStateOrderable = "medianStakingPower"
 	AppStateOrderableMaxStakingPower    AppStateOrderable = "maxStakingPower"
+	AppStateOrderableEthPrice           AppStateOrderable = "ethPrice"
 )
 
 var AllAppStateOrderable = []AppStateOrderable{
@@ -1162,11 +1173,12 @@ var AllAppStateOrderable = []AppStateOrderable{
 	AppStateOrderableTotalStakingPower,
 	AppStateOrderableMedianStakingPower,
 	AppStateOrderableMaxStakingPower,
+	AppStateOrderableEthPrice,
 }
 
 func (e AppStateOrderable) IsValid() bool {
 	switch e {
-	case AppStateOrderablePlaceholder, AppStateOrderableID, AppStateOrderableTotalStakingPower, AppStateOrderableMedianStakingPower, AppStateOrderableMaxStakingPower:
+	case AppStateOrderablePlaceholder, AppStateOrderableID, AppStateOrderableTotalStakingPower, AppStateOrderableMedianStakingPower, AppStateOrderableMaxStakingPower, AppStateOrderableEthPrice:
 		return true
 	}
 	return false

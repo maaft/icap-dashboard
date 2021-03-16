@@ -1,6 +1,20 @@
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT | INTERFACE
+
+directive @secret(field: String!, pred: String) on OBJECT | INTERFACE
+
+directive @cacheControl(maxAge: Int!) on QUERY
+
+directive @withSubscription on OBJECT | INTERFACE
+
+directive @cascade(fields: [String]) on FIELD
+
 directive @dgraph(type: String, pred: String) on OBJECT | INTERFACE | FIELD_DEFINITION
 
+directive @id on FIELD_DEFINITION
+
 directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT | INTERFACE
 
 directive @remote on OBJECT | INTERFACE | UNION | INPUT_OBJECT | ENUM
 
@@ -8,21 +22,7 @@ directive @lambda on FIELD_DEFINITION
 
 directive @hasInverse(field: String!) on FIELD_DEFINITION
 
-directive @secret(field: String!, pred: String) on OBJECT | INTERFACE
-
 directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
-
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT | INTERFACE
-
-directive @cascade(fields: [String]) on FIELD
-
-directive @cacheControl(maxAge: Int!) on QUERY
-
-directive @id on FIELD_DEFINITION
-
-directive @withSubscription on OBJECT | INTERFACE
-
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT | INTERFACE
 
 type Account implements ReadOnly {
   _placeholder: String
@@ -116,6 +116,7 @@ input AddAppStateInput {
   totalStakingPower: Float!
   medianStakingPower: Float!
   maxStakingPower: Float!
+  ethPrice: Float!
 }
 
 type AddAppStatePayload {
@@ -208,6 +209,7 @@ type AppState implements Cuid & ReadOnly {
   totalStakingPower: Float!
   medianStakingPower: Float!
   maxStakingPower: Float!
+  ethPrice: Float!
 }
 
 type AppStateAggregateResult {
@@ -228,6 +230,10 @@ type AppStateAggregateResult {
   maxStakingPowerMax: Float
   maxStakingPowerSum: Float
   maxStakingPowerAvg: Float
+  ethPriceMin: Float
+  ethPriceMax: Float
+  ethPriceSum: Float
+  ethPriceAvg: Float
 }
 
 input AppStateFilter {
@@ -246,6 +252,7 @@ enum AppStateHasFilter {
   totalStakingPower
   medianStakingPower
   maxStakingPower
+  ethPrice
 }
 
 input AppStateOrder {
@@ -260,6 +267,7 @@ enum AppStateOrderable {
   totalStakingPower
   medianStakingPower
   maxStakingPower
+  ethPrice
 }
 
 input AppStatePatch {
@@ -268,6 +276,7 @@ input AppStatePatch {
   totalStakingPower: Float
   medianStakingPower: Float
   maxStakingPower: Float
+  ethPrice: Float
 }
 
 input AppStateRef {
@@ -277,6 +286,7 @@ input AppStateRef {
   totalStakingPower: Float
   medianStakingPower: Float
   maxStakingPower: Float
+  ethPrice: Float
 }
 
 input AuthRule {

@@ -4,6 +4,7 @@ import { Container } from "semantic-ui-react";
 
 import StakingOverview from "./components/StakingOverview";
 import StakingCalculator from "./components/StakingCalculator";
+import LPCalculator from "./components/LPCalculator";
 import TokenOverview from "./components/TokenOverview";
 import TippingBanner from "./components/TippingBanner";
 
@@ -32,6 +33,7 @@ function App() {
         <TippingBanner />
         <StakingOverview statisticsData={statisticsData} tokenData={tokenData} treasuryAccounts={treasuryAccounts}/>
         <TokenOverview tokenData={tokenData} />
+        <LPCalculator />
         <StakingCalculator
           statisticsData={statisticsData}
           tokenData={tokenData}

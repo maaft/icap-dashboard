@@ -172,6 +172,16 @@ type GetAppState struct {
 		TransactionIds []string "json:\"transactionIds\" graphql:\"transactionIds\""
 	} "json:\"queryAppState\" graphql:\"queryAppState\""
 }
+type SetEthPriceClientPayload struct {
+	UpdateAppState *struct {
+		NumUids *int "json:\"numUids\" graphql:\"numUids\""
+	} "json:\"updateAppState\" graphql:\"updateAppState\""
+}
+type GetEthPrice struct {
+	QueryAppState []*struct {
+		EthPrice float64 "json:\"ethPrice\" graphql:\"ethPrice\""
+	} "json:\"queryAppState\" graphql:\"queryAppState\""
+}
 type GetStatistics struct {
 	QueryAppState []*struct {
 		TotalStakingPower  float64 "json:\"totalStakingPower\" graphql:\"totalStakingPower\""
@@ -464,6 +474,44 @@ func (c *Client) GetAppState(ctx context.Context, httpRequestOptions ...client.H
 
 	var res GetAppState
 	if err := c.Client.Post(ctx, GetAppStateQuery, &res, vars, httpRequestOptions...); err != nil {
+		return nil, err
+	}
+
+	return &res, nil
+}
+
+const SetEthPriceQuery = `mutation setEthPrice ($price: Float!) {
+	updateAppState(input: {filter:{has:maxStakingPower},set:{ethPrice:$price}}) {
+		numUids
+	}
+}
+`
+
+func (c *Client) SetEthPrice(ctx context.Context, price float64, httpRequestOptions ...client.HTTPRequestOption) (*SetEthPriceClientPayload, error) {
+	vars := map[string]interface{}{
+		"price": price,
+	}
+
+	var res SetEthPriceClientPayload
+	if err := c.Client.Post(ctx, SetEthPriceQuery, &res, vars, httpRequestOptions...); err != nil {
+		return nil, err
+	}
+
+	return &res, nil
+}
+
+const GetEthPriceQuery = `query getEthPrice {
+	queryAppState {
+		ethPrice
+	}
+}
+`
+
+func (c *Client) GetEthPrice(ctx context.Context, httpRequestOptions ...client.HTTPRequestOption) (*GetEthPrice, error) {
+	vars := map[string]interface{}{}
+
+	var res GetEthPrice
+	if err := c.Client.Post(ctx, GetEthPriceQuery, &res, vars, httpRequestOptions...); err != nil {
 		return nil, err
 	}
 

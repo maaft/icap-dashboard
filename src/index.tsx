@@ -65,7 +65,7 @@ const makeClient = (remote: boolean) =>
   });
 
 const clientLocal = makeClient(false);
-const clientRemote = makeClient(true);
+export const clientRemote = makeClient(true);
 
 const client = new ApolloClient({
   cache: new InMemoryCache(),

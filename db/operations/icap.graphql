@@ -105,6 +105,21 @@ query getAppState {
   }
 }
 
+mutation setEthPrice($price: Float!) {
+  updateAppState(input: {
+    filter: {has: maxStakingPower}
+    set: {ethPrice: $price}
+  }) {
+    numUids
+  }
+}
+
+query getEthPrice {
+  queryAppState {
+    ethPrice
+  }
+}
+
 query getStatistics {
   queryAppState{
     totalStakingPower
