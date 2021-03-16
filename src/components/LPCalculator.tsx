@@ -181,26 +181,32 @@ export default function LPCalculator() {
                 type="number"
                 placeholder="Amount"
                 onChange={(event, data) =>
-                  setPooledICAP(parseFloat(data.value))
+                  {
+                    setPooledICAP(parseFloat(data.value))
+                    setPooledICAPEth(parseFloat(data.value) * icapPrice / currentEthPrice)
+                  }
                 }
               >
                 <Label color="pink" basic>
                   ICAP
                 </Label>
-                <input />
+                <input value={pooledICAP}/>
               </Input>
               <Input
                 labelPosition="right"
                 type="number"
                 placeholder="Amount"
                 onChange={(event, data) =>
-                  setPooledICAPEth(parseFloat(data.value))
+                  {
+                    setPooledICAPEth(parseFloat(data.value));
+                    setPooledICAP(parseFloat(data.value) * currentEthPrice / icapPrice);
+                  } 
                 }
               >
                 <Label color="blue" basic>
                   ETH
                 </Label>
-                <input />
+                <input value={pooledICAPEth}/>
               </Input>
             </Card.Content>
             <Card.Content extra>
@@ -209,25 +215,31 @@ export default function LPCalculator() {
                 labelPosition="right"
                 type="number"
                 placeholder="Amount"
-                onChange={(event, data) => setPooledC20(parseFloat(data.value))}
+                onChange={(event, data) => {
+                  setPooledC20(parseFloat(data.value))
+                  setPooledC20Eth(parseFloat(data.value) * c20Price / currentEthPrice)
+                }}
               >
                 <Label color="olive" basic>
                   C20
                 </Label>
-                <input />
+                <input value={pooledC20}/>
               </Input>
               <Input
                 labelPosition="right"
                 type="number"
                 placeholder="Amount"
                 onChange={(event, data) =>
-                  setPooledC20Eth(parseFloat(data.value))
+                  {
+                    setPooledC20Eth(parseFloat(data.value))
+                    setPooledC20(parseFloat(data.value) * currentEthPrice / c20Price)
+                  }
                 }
               >
                 <Label color="blue" basic>
                   ETH
                 </Label>
-                <input />
+                <input value={pooledC20Eth}/>
               </Input>
             </Card.Content>
           </Card>
