@@ -1,7 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { gql, useQuery, ApolloClient, InMemoryCache } from "@apollo/client";
 
-import { Grid, Segment, Card, Input, Label, Checkbox } from "semantic-ui-react";
+import {
+  Grid,
+  Button,
+  Segment,
+  Card,
+  Input,
+  Label,
+  Checkbox,
+} from "semantic-ui-react";
 
 import { useGetEthPriceQuery } from "../generated-client";
 
@@ -18,6 +26,8 @@ type LiquidityQuery = {
   pair: { reserveUSD: string; token0Price: string; token1Price: string };
 };
 
+type Scenario = "always-lp-program" | "realistic" | "fees-only";
+
 export default function LPCalculator() {
   const { data: ethPrice } = useGetEthPriceQuery({
     pollInterval: 60000,
@@ -28,14 +38,20 @@ export default function LPCalculator() {
     currentEthPrice = ethPrice.queryAppState[0]?.ethPrice || 0;
   }
 
+  const daysForVolumeCalc = 7;
+
   const [timestamp, setTimestamp] = useState(
-    "" + (Math.floor(new Date().getTime() / 1000) - 24 * 60 * 60)
+    "" +
+      (Math.floor(new Date().getTime() / 1000) -
+        24 * 60 * 60 * daysForVolumeCalc)
   );
 
   useEffect(() => {
     setTimeout(() => {
       setTimestamp(
-        "" + (Math.floor(new Date().getTime() / 1000) - 24 * 60 * 60)
+        "" +
+          (Math.floor(new Date().getTime() / 1000) -
+            24 * 60 * 60 * daysForVolumeCalc)
       );
     }, 60 * 60 * 1000);
   });
@@ -93,13 +109,13 @@ export default function LPCalculator() {
 
   const icapEthTotalVolume =
     icapETHVolume?.swaps.reduce(
-      (acc, curr) => acc + parseFloat(curr.amountUSD),
+      (acc, curr) => acc + parseFloat(curr.amountUSD) / daysForVolumeCalc,
       0
     ) || 0;
 
   const c20EthTotalVolume =
     c20ETHVolume?.swaps.reduce(
-      (acc, curr) => acc + parseFloat(curr.amountUSD),
+      (acc, curr) => acc + parseFloat(curr.amountUSD) / daysForVolumeCalc,
       0
     ) || 0;
 
@@ -109,6 +125,24 @@ export default function LPCalculator() {
   const [pooledC20Eth, setPooledC20Eth] = useState(0);
 
   const [hasPooled, setHasPooled] = useState(false);
+
+  const [apyScenario, setApyScenario] = useState<Scenario>("always-lp-program");
+
+  const now = new Date();
+  const start = new Date(1616000898 * 1000);
+
+  //@ts-ignore
+  const diff = Math.ceil(Math.abs(now - start) / (1000 * 60 * 60 * 24));
+  const daysLeft = 90 - diff > 0 ? 90 - diff : 0;
+  console.log(daysLeft);
+  const lpProgramCapitalLeft = (30000 * daysLeft) / 90;
+
+  let rewardProgramCapital = 0;
+  if (apyScenario === "always-lp-program") {
+    rewardProgramCapital = 12 * 10000;
+  } else if (apyScenario === "realistic") {
+    rewardProgramCapital = lpProgramCapitalLeft;
+  }
 
   const c20Price =
     parseFloat(c20ETHLiquidity?.pair.token1Price || "0") * currentEthPrice;
@@ -131,12 +165,15 @@ export default function LPCalculator() {
     (hasPooled ? ICAPETHPoolsize : ICAPETHPoolsize + pooledICAPETHAmount);
 
   const revenueC20ETH =
-    shareC20ETH * (c20EthTotalVolume * 0.003 * 365 + 12 * 10000);
+    shareC20ETH * (c20EthTotalVolume * 0.003 * 365 + rewardProgramCapital);
   const revenueICAPETH =
-    shareICAPETH * (icapEthTotalVolume * 0.003 * 365 + 12 * 10000);
+    shareICAPETH * (icapEthTotalVolume * 0.003 * 365 + rewardProgramCapital);
 
-  const apyC20ETH = 100 * (revenueC20ETH / (pooledC20ETHAmount === 0 ? 1 : pooledC20ETHAmount));
-  const apyICAPETH = 100 * (revenueICAPETH / (pooledICAPETHAmount === 0 ? 1 : pooledICAPETHAmount));
+  const apyC20ETH =
+    100 * (revenueC20ETH / (pooledC20ETHAmount === 0 ? 1 : pooledC20ETHAmount));
+  const apyICAPETH =
+    100 *
+    (revenueICAPETH / (pooledICAPETHAmount === 0 ? 1 : pooledICAPETHAmount));
 
   return (
     <Segment.Group>
@@ -173,6 +210,42 @@ export default function LPCalculator() {
                   setHasPooled(!hasPooled);
                 }}
               />
+              < br/>
+              < br/>
+              <Button.Group size="tiny">
+                <Button
+                  size="tiny"
+                  color="olive"
+                  basic={apyScenario !== "fees-only"}
+                  onClick={() => setApyScenario("fees-only")}
+                  data-tooltip="Use only uniswap fees to calculate rewards."
+                >
+                  min
+                </Button>
+                <Button.Or />
+                <Button
+                  color="teal"
+                  basic={apyScenario !== "realistic"}
+                  onClick={() => setApyScenario("realistic")}
+                  data-tooltip={
+                    "Assume 3 month liquidity mining program, left-over capital $" +
+                    lpProgramCapitalLeft
+                      .toFixed(2)
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  }
+                >
+                  real
+                </Button>
+                <Button.Or />
+                <Button
+                  basic={apyScenario !== "always-lp-program"}
+                  color="pink"
+                  onClick={() => setApyScenario("always-lp-program")}
+                  data-tooltip="Assume on-going liquidity mining program."
+                >
+                  max
+                </Button>
+              </Button.Group>
             </Card.Content>
             <Card.Content extra>
               <Card.Header>ICAP-ETH Pool</Card.Header>
@@ -180,33 +253,33 @@ export default function LPCalculator() {
                 labelPosition="right"
                 type="number"
                 placeholder="Amount"
-                onChange={(event, data) =>
-                  {
-                    setPooledICAP(parseFloat(data.value))
-                    setPooledICAPEth(parseFloat(data.value) * icapPrice / currentEthPrice)
-                  }
-                }
+                onChange={(event, data) => {
+                  setPooledICAP(parseFloat(data.value));
+                  setPooledICAPEth(
+                    (parseFloat(data.value) * icapPrice) / currentEthPrice
+                  );
+                }}
               >
                 <Label color="pink" basic>
                   ICAP
                 </Label>
-                <input value={pooledICAP}/>
+                <input value={pooledICAP} />
               </Input>
               <Input
                 labelPosition="right"
                 type="number"
                 placeholder="Amount"
-                onChange={(event, data) =>
-                  {
-                    setPooledICAPEth(parseFloat(data.value));
-                    setPooledICAP(parseFloat(data.value) * currentEthPrice / icapPrice);
-                  } 
-                }
+                onChange={(event, data) => {
+                  setPooledICAPEth(parseFloat(data.value));
+                  setPooledICAP(
+                    (parseFloat(data.value) * currentEthPrice) / icapPrice
+                  );
+                }}
               >
                 <Label color="blue" basic>
                   ETH
                 </Label>
-                <input value={pooledICAPEth}/>
+                <input value={pooledICAPEth} />
               </Input>
             </Card.Content>
             <Card.Content extra>
@@ -216,30 +289,32 @@ export default function LPCalculator() {
                 type="number"
                 placeholder="Amount"
                 onChange={(event, data) => {
-                  setPooledC20(parseFloat(data.value))
-                  setPooledC20Eth(parseFloat(data.value) * c20Price / currentEthPrice)
+                  setPooledC20(parseFloat(data.value));
+                  setPooledC20Eth(
+                    (parseFloat(data.value) * c20Price) / currentEthPrice
+                  );
                 }}
               >
                 <Label color="olive" basic>
                   C20
                 </Label>
-                <input value={pooledC20}/>
+                <input value={pooledC20} />
               </Input>
               <Input
                 labelPosition="right"
                 type="number"
                 placeholder="Amount"
-                onChange={(event, data) =>
-                  {
-                    setPooledC20Eth(parseFloat(data.value))
-                    setPooledC20(parseFloat(data.value) * currentEthPrice / c20Price)
-                  }
-                }
+                onChange={(event, data) => {
+                  setPooledC20Eth(parseFloat(data.value));
+                  setPooledC20(
+                    (parseFloat(data.value) * currentEthPrice) / c20Price
+                  );
+                }}
               >
                 <Label color="blue" basic>
                   ETH
                 </Label>
-                <input value={pooledC20Eth}/>
+                <input value={pooledC20Eth} />
               </Input>
             </Card.Content>
           </Card>
