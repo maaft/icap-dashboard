@@ -9,6 +9,7 @@ import {
   Input,
   Label,
   Checkbox,
+  Popup,
 } from "semantic-ui-react";
 
 import { useGetEthPriceQuery } from "../generated-client";
@@ -19,7 +20,7 @@ const uniswapClient = new ApolloClient({
 });
 
 type VolumeQuery = {
-  swaps: Array<{ amountUSD: string }>;
+  swaps: Array<{ amountUSD: string; timestamp: string }>;
 };
 
 type LiquidityQuery = {
@@ -46,6 +47,8 @@ export default function LPCalculator() {
         24 * 60 * 60 * daysForVolumeCalc)
   );
 
+  const theDayBefore = Math.floor(new Date().getTime() / 1000) - 24 * 60 * 60;
+
   useEffect(() => {
     setTimeout(() => {
       setTimestamp(
@@ -60,6 +63,7 @@ export default function LPCalculator() {
     query($startTime: BigInt!, $pairAddress: String!) {
       swaps(where: { timestamp_gte: $startTime, pair: $pairAddress }) {
         amountUSD
+        timestamp
       }
     }
   `;
@@ -113,11 +117,21 @@ export default function LPCalculator() {
       0
     ) || 0;
 
+  const icapEth24Volume =
+    icapETHVolume?.swaps
+      .filter((v) => parseInt(v.timestamp) >= theDayBefore)
+      .reduce((acc, curr) => acc + parseFloat(curr.amountUSD), 0) || 0;
+
   const c20EthTotalVolume =
     c20ETHVolume?.swaps.reduce(
       (acc, curr) => acc + parseFloat(curr.amountUSD) / daysForVolumeCalc,
       0
     ) || 0;
+
+  const c20Eth24Volume =
+    c20ETHVolume?.swaps
+      .filter((v) => parseInt(v.timestamp) >= theDayBefore)
+      .reduce((acc, curr) => acc + parseFloat(curr.amountUSD), 0) || 0;
 
   const [pooledICAP, setPooledICAP] = useState(0);
   const [pooledC20, setPooledC20] = useState(0);
@@ -134,7 +148,7 @@ export default function LPCalculator() {
   //@ts-ignore
   const diff = Math.ceil(Math.abs(now - start) / (1000 * 60 * 60 * 24));
   const daysLeft = 90 - diff > 0 ? 90 - diff : 0;
-  console.log(daysLeft);
+
   const lpProgramCapitalLeft = (30000 * daysLeft) / 90;
 
   let rewardProgramCapital = 0;
@@ -210,8 +224,8 @@ export default function LPCalculator() {
                   setHasPooled(!hasPooled);
                 }}
               />
-              < br/>
-              < br/>
+              <br />
+              <br />
               <Button.Group size="tiny">
                 <Button
                   size="tiny"
@@ -332,11 +346,60 @@ export default function LPCalculator() {
                     Liquidity Mining Program{" "}
                   </a>
                 }{" "}
-                and are based on daily pool statistics.
+                and are based on current pool statistics.
               </Card.Description>
             </Card.Content>
             <Card.Content extra>
-              <Card.Header>ICAP-ETH Pool</Card.Header>
+              <Card.Header>
+                {
+                  <Popup trigger={<p>ICAP-ETH Pool </p>}>
+                    <Popup.Header>Current Pool Statistics</Popup.Header>
+                    <Popup.Content>
+                      <Label color="yellow" basic>
+                        ETH Price
+                      </Label>
+                      <Label color="olive" basic>
+                        $
+                        {currentEthPrice
+                          .toFixed(2)
+                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                      </Label>
+                      <br />
+                      <Label color="green" basic>
+                        24h Volume
+                      </Label>
+                      <Label color="teal" basic>
+                        $
+                        {icapEth24Volume
+                          .toFixed(2)
+                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                      </Label>
+                      <br />
+                      <Label color="blue" basic>
+                        7d Volume
+                      </Label>
+                      <Label color="purple" basic>
+                        $
+                        {(7 * icapEthTotalVolume)
+                          .toFixed(2)
+                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                      </Label>
+                      <br />
+                      <Label color="violet" basic>
+                        Liquidity
+                      </Label>
+                      <Label color="pink" basic>
+                        $
+                        {ICAPETHPoolsize.toFixed(2).replace(
+                          /\B(?=(\d{3})+(?!\d))/g,
+                          ","
+                        )}
+                      </Label>
+                      <br />
+                    </Popup.Content>
+                  </Popup>
+                }
+              </Card.Header>
               <Label color="yellow" basic>
                 Pooled USD
               </Label>
@@ -372,7 +435,55 @@ export default function LPCalculator() {
               </Label>
             </Card.Content>
             <Card.Content extra>
-              <Card.Header>C20-ETH Pool</Card.Header>
+              <Card.Header>
+                {
+                  <Popup trigger={<p>C20-ETH Pool </p>}>
+                    <Popup.Header>Current Pool Statistics</Popup.Header>
+                    <Popup.Content>
+                      <Label color="yellow" basic>
+                        ETH Price
+                      </Label>
+                      <Label color="olive" basic>
+                        $
+                        {currentEthPrice
+                          .toFixed(2)
+                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                      </Label>
+                      <br />
+                      <Label color="green" basic>
+                        24h Volume
+                      </Label>
+                      <Label color="teal" basic>
+                        $
+                        {c20Eth24Volume
+                          .toFixed(2)
+                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                      </Label>
+                      <br />
+                      <Label color="blue" basic>
+                        7d Volume
+                      </Label>
+                      <Label color="purple" basic>
+                        $
+                        {(7 * c20EthTotalVolume)
+                          .toFixed(2)
+                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                      </Label>
+                      <br />
+                      <Label color="violet" basic>
+                        Liquidity
+                      </Label>
+                      <Label color="pink" basic>
+                        $
+                        {c20ETHPoolsize
+                          .toFixed(2)
+                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                      </Label>
+                      <br />
+                    </Popup.Content>
+                  </Popup>
+                }
+              </Card.Header>
               <Label color="yellow" basic>
                 Pooled USD
               </Label>
