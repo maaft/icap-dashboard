@@ -147,9 +147,9 @@ export default function LPCalculator() {
 
   //@ts-ignore
   const diff = Math.ceil(Math.abs(now - start) / (1000 * 60 * 60 * 24));
-  const daysLeft = 180 - diff > 0 ? 180 - diff : 0;
+  const daysLeft = 210 - diff > 0 ? 210 - diff : 0;
 
-  const lpProgramCapitalLeft = (60000 * daysLeft) / 180;
+  const lpProgramCapitalLeft = (70000 * daysLeft) / 210;
 
   let rewardProgramCapital = 0;
   if (apyScenario === "always-lp-program") {
