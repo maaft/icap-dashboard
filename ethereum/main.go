@@ -35,13 +35,11 @@ const (
 	tokenAddressIHF tokenAddress = "0xaf1250fa68d7decd34fd75de8742bc03b29bd58e"
 	tokenAddressC20 tokenAddress = "0x26e75307fc0c021472feb8f727839531f112f317"
 	tokenAddressC10 tokenAddress = "0x000c100050e98c91f9114fa5dd75ce6869bf4f53"
-	tokenAddressEMS tokenAddress = "0xc4d5c69439e028b9bc86af0ae5c038990bfac43c"
 	tokenAddressIBA tokenAddress = "0xa32ec8db6ba73ee374dfed2dd566a53f6dc23ebe"
-	tokenAddressIGP tokenAddress = "0x8df1be0fdf7161a6ff56c8189d7e10358727a96c"
 	tokenAddressIML tokenAddress = "0x7ca598a636647b114292bb66e1336865fc262d11"
 )
 
-var tokenAddresses = [...]tokenAddress{tokenAddressIHF, tokenAddressC20, tokenAddressC10, tokenAddressEMS, tokenAddressIBA, tokenAddressIGP, tokenAddressIML}
+var tokenAddresses = [...]tokenAddress{tokenAddressIHF, tokenAddressC20, tokenAddressC10, tokenAddressIBA, tokenAddressIML}
 
 func timeMultiplierFromSeconds(seconds int) float64 {
 	switch seconds {
@@ -64,12 +62,8 @@ func tickerFromAddress(address tokenAddress) string {
 		return "C10"
 	case tokenAddressC20:
 		return "C20"
-	case tokenAddressEMS:
-		return "EMS"
 	case tokenAddressIBA:
 		return "IBA"
-	case tokenAddressIGP:
-		return "IGP"
 	case tokenAddressIHF:
 		return "IHF"
 	case tokenAddressIML:
@@ -85,12 +79,8 @@ func baseMultiplierFromAddress(address tokenAddress) float64 {
 		return 1.0
 	case tokenAddressC20:
 		return 1.0
-	case tokenAddressEMS:
-		return 1.0
 	case tokenAddressIBA:
 		return 1.33
-	case tokenAddressIGP:
-		return 1.0
 	case tokenAddressIHF:
 		return 1.0
 	case tokenAddressIML:
@@ -106,12 +96,8 @@ func nameFromAddress(address tokenAddress) string {
 		return "Crypto10 Hedged"
 	case tokenAddressC20:
 		return "Crypto20"
-	case tokenAddressEMS:
-		return "Emerging Markets Solar"
 	case tokenAddressIBA:
 		return "Invictus Bitcoin Alpha"
-	case tokenAddressIGP:
-		return "Invictus Gold Plus"
 	case tokenAddressIHF:
 		return "Invictus Hyperion Fund"
 	case tokenAddressIML:
